@@ -1,0 +1,29 @@
+#
+# Docker Compose configuration to launch the Bidder environment in Docker.
+# It makes it easier to run it locally and - more important - easily enables us
+# to run our e2e tests on Jenkins.
+#
+
+version: '2'
+
+services:
+    my-redis:
+        container_name: my-redis
+        image: redis
+        expose:
+          - 6379
+
+    reproducer-webserver:
+        container_name: webserver
+        image: java:8-jdk
+        expose:
+          - 8083
+        volumes:
+          - .:/src
+        links:
+          - my-redis
+        command: java -jar /src/build/libs/dns-reproducer.jar
+
+networks:
+    bidder-net:
+        driver: bridge
